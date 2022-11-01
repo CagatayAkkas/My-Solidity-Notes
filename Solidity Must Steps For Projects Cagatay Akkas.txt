@@ -1,0 +1,198 @@
+Author: Çağatay Akkaş
+global add hardhat-shorthand
+hh compile = yarn hardhat compile
+Notes:
+1)Dont call another contract while doing a transaction inside of a function -> reenterancy attack 
+2)use safeTransferFrom
+
+0)Write the main contract
+From here thsese are for scripts/hardhatconfig file
+1)yarn init -> delete the main in package.json
+2)yarn add --dev hardhat
+3)yarn hardhat -> then chose JavaScpirt project -> install the ones it says(copy paste all of them)
+yarn add --dev @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers ethers @nomiclabs/hardhat-etherscan @nomiclabs/hardhat-waffle chai ethereum-waffle hardhat hardhat-contract-sizer hardhat-deploy hardhat-gas-reporter prettier prettier-plugin-solidity solhint solidity-coverage dotenv
+this will pop up node_modules
+4)yarn hardhat compile -> artifact and cache will appear
+5)yarn add --dev prettier prettier-plugin-solidity
+6).prettierrc file olustur / .prettier ignore
+7)for using local host first start node
+7)For price converter yarn add --dev @chainlink/contracts
+inside .prettier
+{
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": false,
+  "singleQuote": false
+}
+7)At top
+const {ethers}=require("hardhat")
+async function main() {
+ const mainFactory = await ethers.getContractFactory("main")
+
+  console.log("Deploying contracto")
+  const main = await mainFactory.deploy()
+
+await simpleStorage.deployed()
+  console.log(`Deployed contract to: ${simpleStorage.address}`)
+}
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })
+8) function inside main
+const SimpleStorageFactory = await ethers.getContractFactory("SimpleStorage")
+  console.log("Deploying contract...")
+  const simpleStorage = await SimpleStorageFactory.deploy()
+9) write network part to the hardhatconfig file and add network rpc url to .env file
+require("@nomicfoundation/hardhat-toolbox")
+require("dotenv").config() //-> I lost 40 min to these paranteses error
+const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL // -> here you can add || "hardcodedurl"
+module.exports = {
+    defaultNetwork: "hardhat",
+    networks: {
+        rinkeby: {
+            url: RINKEBY_RPC_URL,
+            accounts: [PRIVATE_KEY], 
+	    chainId: 4, //-> this for rinkeby
+        },
+    },
+    solidity: "0.8.9",
+}
+         Verifying -> only if the network is live  while working with live dont forget to add network at request ethers require hardhat
+10)async function verify(contractAddress, args) {} //-> for verifying () empty becase no contructor in this exp.
+11)yarn add --dev @nomiclabs/hardhat-etherscan
+12)require("@nomiclabs/hardhat-etherscan")
+//inside of the script main
+if (network.config.chainId === 4 && process.env.ETHESCAN_API_KEY) {
+    await Backhand.deployTransaction.wait(6)
+    await verify(Backhand.address, [])
+  }
+//after that
+
+async function verify(contractAddress, args) {
+  console.log("verifying contract")
+  try {
+    await run("verify:verify", {
+      address: contractAddress,
+      constructorArguments: args,
+    })
+  } catch (e) {
+    if (e.message.toLowerCase().includes("already verified")) {
+      console.log("already verified sry")
+    } else {
+      console.log(e)
+    }
+  }
+}
+13)ETHERSCAN_API_KEY=-> to .env
+14) etherscan: { //-> to module.export 
+        apiKey: ETHERSCAN_API_KEY,  
+    },
+15) add run to const { ethers,run <- } = require("hardhat")
+16)try {
+        await run("verify:verify", {
+            address: contractAddress,
+            constructorArguments: args,
+        })
+    } catch (e) {
+      if (e.message.toLowerCase().includes("already verified")) {
+        console.log("already verified buddy")
+      }
+      else {
+        console.log(e)
+      }
+    }
+17)console.log(network.config)
+    if (network.config.chainId === 4 && process.env.ETHERSCAN_API_KEY) {
+    }  -> adding this line to deploy js in function main it will print useful info
+18)if we have error while running delete artifact and cache then re run 
+19)for local hosting to hardhatconfig -> localhost: {
+            url: "http://127.0.0.1:8545/",
+            chainId: 31337,
+        },
+           Testing part
+20)const { ethers } = require("hardhat")
+const { expect, assert } = require("chai")
+
+describe("SimpleStorage", function () {
+    let SimpleStorageFactory
+    let SimpleStorage
+
+    beforeEach(async function () {
+        SimpleStorageFactory = await ethers.getContractFactory("SimpleStorage")
+        SimpleStorage = await SimpleStorageFactory.deploy()
+    })
+
+    it("should starto with favorite number of 0 ", async function () {
+        const currentValue = await SimpleStorage.retrieve()
+        const expectedValue = "0"
+        assert.equal(currentValue.toString(), expectedValue)
+    })
+    it("should update when we call store", async function () {
+        const expectedValue = "7"
+        const tranactionResponse = await SimpleStorage.store(expectedValue)
+        await tranactionResponse.wait(1)
+        const currentValue = await SimpleStorage.retrieve()
+        assert.equal(currentValue.toString(), expectedValue) // this is same with expect(currentValue.toString()).to.equal(expectedValue)
+    })
+})
+
+21)for compiling from hardhat yarn hardhat test --grep word -> here write a word that is in it description for testing it or write it.only for running them only
+            Gas Reporting
+22)yarn add hardhat-gas-reporter --dev
+require("hardhat-gas-reporter")
+gasReporter: {
+        enabled: true,
+        outputFile: "gas-report.txt",
+        noColors: true,
+        currency: "USD",
+        coinmarketcap: COINMARKET, -> take this API from coinmarketcap
+    },
+23)yarn add --dev solidity-coverage
+24).solhint.json -> yarn solhint contracts/contractname -> if you decleared buy not used something it will wanrn you and do other things
+  
+              Deploy -> mock icin lazım bu
+for run yarn hardhat deploy
+25)yarn add --dev hardhat-deploy
+26)open new folder named deploy and make file named 01-deploy-name.js
+27)require("hardhat-deploy") // to hardhat.config.js
+28)yarn add --dev @nomiclabs/hardhat-ethers@npm:hardhat-deploy-ethers ethers
+29)at 01-deploy
+const { deployments, network } = require("hardhat")
+
+function deployFunc(hre) {
+    const { getNamedAccounts, deployments } = hre
+    const { deployFunc, log } = deployments
+    const { deployer } = await getNamedAccounts()
+    const chainId= network.config.chainId
+  console.log("yahharo")
+}
+module.exports.default = deployFunc
+
+30)to hardhat config
+namedAccounts: {
+    deployer: {
+      default: 0,
+    },
+    user: {
+      default: 1,
+    },
+  },
+31)ERROR cannot find artifact "VRFCoordinatorV2Mock" -> put MockV3Aggregator.sol in contracts folder :https://github.com/smartcontractkit/chainlink-mix/blob/main/contracts/test/MockV3Aggregator.sol
+32)
+33)
+
+
+
+
+
+
+
+
+
+
+
+
+

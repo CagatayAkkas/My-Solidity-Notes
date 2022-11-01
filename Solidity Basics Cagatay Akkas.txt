@@ -1,0 +1,152 @@
+Author: Çağatay Akkaş
+      General
+-For deploying on visual studio : yarn solcjs --bin --abi --include-path node_modules/ --base-path . -o . SimpleStorage.sol
+-Add "scripts":{
+    "compile": "yarn solcjs --bin --abi --include-path node_modules/ --base-path . -o . SimpleStorage.sol"
+  } for making it compile when we type yarn compile without long thing
+-Function order constructor-> recieve -> fallback -> external -> public -> interval-> private -> view/pure
+-While we are adding values called from blockchain they are big numbers so we dont use + instead we are using .add(the value we want to add)
+-! while using big numbers, for checking them use toString , when multiplying them .mul()
+-we will always need an ABI and a contract address
+-mock: if contract doest exist we deploy minimal version of contract for testing (we deploy script)
+-we are using ıpfs for hashing large data and storing it on blockchain 
+-we need a node for using scripts
+-
+
+////////////////////////////////////////////////////
+       Most Basic Script
+const ethers = require("ethers");
+const fs = require("fs-extra");
+
+
+
+async function main() {
+
+    const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
+    const wallet = new ethers.Wallet("", provider);
+    const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf8");
+    const binary = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.bin", "utf8");
+    const contractFactory = new ethers.ContractFactory(abi, binary, wallet);
+    console.log("Deploying, please wait...");
+    const contract = await contractFactory.deploy();
+    console.log(contract);
+}
+
+main()
+.then(() => process.exit(0))
+.catch((error)=>{
+    console.error(error);
+     process.exit(1)
+});
+////////////////////////////////////////////////////
+      Arrays
+-Declearing -> int [] public number;
+
+      Storage vs Memory
+-When we copy a variable with storage and change it the original value will also change
+-With mermory even we change the copy it wont affect the original one
+-link:https://www.geeksforgeeks.org/storage-vs-memory-in-solidity/
+
+      Mappings
+-link:https://www.geeksforgeeks.org/solidity-mappings/#:~:text=Mapping%20in%20Solidity%20acts%20like,can%20be%20of%20any%20type.
+     
+Enums and structs: enum week_days{Monday,Tuesday}
+Struct : struct book {string name; uint id; bool available}
+Difference: Enums generally used for same typed variables in struct we define variable types
+
+      Async / Promises 
+-with async function we can decleare await and it will wait for functions which has retutn Promise() in it
+-
+
+      Task
+-for making our task we open new folder named tasks and in that after writing require part task("name of task","what it does").setAction()
+
+
+      Test
+-describe 
+-beforeEach
+-it("what it needs to do", async function)
+-1)for testing specific "it" we can type hardhat test --grep a word at 1st part of it without "" and if other its has same word we also will test them
+-2)for testing specific "it" we can write them as it.only and these will be tested when we write yarn hardhat test
+-For getting gas price we will dawnload yarn add hardhat-gas-reporter --dev
+-And will write gasReporter:{enabled:true} and at top require("hardhat-gas-reporter")
+-Then under(at same {}) enabled we will write outputFile:"gas-report.txt" and add this to git ignore
+
+	Events
+-index parameters = Topics
+-When using events name them the reverse of functions name -> function cagatay akkas -> event akkas cagatay
+-events are not accesible inside of the contract
+
+
+    Keeper
+-makes contract work automaticaly
+-
+
+
+ERC20s
+EIPs : Ethereum Improvement Proposals
+ERC : Ethereum Request for Comments
+
+
+                  NFT 
+-We use EIP-721 non fungible tokens for nft
+-yarn add --dev @openzeppelin/contracts
+-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+contract BasicNft is ERC721{
+
+
+ }
+-yarn add --dev @chainlink/contracts
+-yarn add --dev @pinata/sdk
+-yarn add --dev path
+-base 64 useage
+-yarn add --dev base64-sol 
+      
+         For fronthand
+-yarn create next-app .  // this . is important 
+-yarn dev and clikt httplocalhost and continue from opened screen 
+- yarn add web3uikit moralis react-moralis
+-yarn add --dev tailwindcss postcss autoprefixer
+-yarn tailwindcss init -p
+-how to make moralis listen our events 25.26.31
+-github.com/fatedier/frp/releases 25.28.20
+-(arada kacan indirmeler olmus olabilir
+-yarn global add moralis-admin-cli
+-yarn moralis:sync //will connect to moralis if name is sync
+-yarn global add @graphprotocol/graph-cli
+-graph init --studio nft-marketplace // (name of the project)
+protocol ethereum
+subgrapg slug name of project
+directory . or name of project
+contract address : deployed contract address (already verified from etherscan )
+make every file out from only file then delete it
+graph 1.04.12
+-
+
+       Proxy
+!!!- when we use another contracts function the variables names no need to be same machine doest look at the names it looks at the places where they are indexed at storage slots
+-
+
+
+       Security
+-slither 1.07.30
+
+
+
+
+         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
